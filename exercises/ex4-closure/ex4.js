@@ -13,6 +13,7 @@ var $workEntryTime;
 var $workEntrySubmit;
 var $totalTime;
 var $projectList;
+var $myDots;
 
 initUI();
 
@@ -122,9 +123,23 @@ function addWorkToProject(projectId,description,minutes) {
 		});
 	}
 
+	var full = workEntryData.description;
 	addWorkEntryToList(projectEntryData,workEntryData);
 	updateProjectTotalTime(projectEntryData);
 	updateWorkLogTotalTime();
+	//det 
+	$myDots = $("[rel*=mydots");
+	debugger;
+	$myDots.on("click",exposeFull(full));
+	function exposeFull(full){
+		return function(){
+			console.log(full);
+			console.log(this); //cool
+		};
+	}
+	
+
+	
 }
 
 function addWorkEntryToList(projectEntryData,workEntryData) {
@@ -167,7 +182,8 @@ function addWorkEntryToList(projectEntryData,workEntryData) {
 }
 
 function setupWorkDescription(workEntryData,$workDescription) {
-	$workDescription.text(formatWorkDescription(workEntryData.description));
+
+	$workDescription.html(formatWorkDescription(workEntryData.description));
 
 	if (workEntryData.description.length > maxVisibleWorkDescriptionLength) {
 		$workDescription.addClass("shortened");
@@ -191,7 +207,7 @@ function updateWorkLogTotalTime() {
 
 function formatWorkDescription(description) {
 	if (description.length > maxVisibleWorkDescriptionLength) {
-		description = `${description.substr(0,maxVisibleWorkDescriptionLength)}...`;
+		description = `${description.substr(0,maxVisibleWorkDescriptionLength)}<span rel="mydots">...</span>`;
 	}
 	return description;
 }
