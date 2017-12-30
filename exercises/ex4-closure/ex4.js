@@ -128,18 +128,19 @@ function addWorkToProject(projectId,description,minutes) {
 	updateProjectTotalTime(projectEntryData);
 	updateWorkLogTotalTime();
 	//det 
-	$myDots = $("[rel*=mydots");
+	$myDots = $("[rel*=js-work-description");
 	debugger;
-	$myDots.on("click",exposeFull(full));
 	function exposeFull(full){
-		return function(){
-			console.log(full);
-			console.log(this); //cool
+		var f;
+		f =  function(){
+			this.innerText = full;
+			debugger;
+			$myDots.off("click",f);
+			this.classList.remove("shortened");
 		};
+		return f;
 	}
-	
-
-	
+	$myDots.on("click",exposeFull(full));
 }
 
 function addWorkEntryToList(projectEntryData,workEntryData) {
@@ -207,7 +208,7 @@ function updateWorkLogTotalTime() {
 
 function formatWorkDescription(description) {
 	if (description.length > maxVisibleWorkDescriptionLength) {
-		description = `${description.substr(0,maxVisibleWorkDescriptionLength)}<span rel="mydots">...</span>`;
+		description = `${description.substr(0,maxVisibleWorkDescriptionLength)}...`;
 	}
 	return description;
 }

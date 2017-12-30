@@ -37,6 +37,7 @@ function initUI() {
 }
 
 function submitNewWorkEntry() {
+	debugger;
 	var projectId = $workEntrySelectProject.val();
 	var description = $workEntryDescription.val();
 	var minutes = $workEntryTime.val();
@@ -49,6 +50,7 @@ function submitNewWorkEntry() {
 
 	$workEntryDescription.val("");
 	$workEntryTime.val("");
+	debugger;
 	addWorkToProject(Number(projectId),description,Number(minutes));
 	$workEntryDescription[0].focus();
 }
@@ -107,14 +109,18 @@ function findProjectEntry(projectId) {
 function addWorkToProject(projectId,description,minutes) {
 	projects.time = (projects.time || 0) + minutes;
 
+	// fetch rel project
 	var projectEntryData = findProjectEntry(projectId);
 	projectEntryData.time = (projectEntryData.time || 0) + minutes;
 
 	// create a new work entry for the list
+	// create object to represent the work & push it
 	var workEntryData = { id: projectEntryData.work.length + 1, description: description, time: minutes };
+	
 	projectEntryData.work.push(workEntryData);
 
 	// multiple work entries now?
+	// for sorting reasons
 	if (projectEntryData.work.length > 1) {
 		// sort work entries in descending order of time spent
 		projectEntryData.work = projectEntryData.work.slice().sort(function sortTimeDescending(a,b){
@@ -122,19 +128,26 @@ function addWorkToProject(projectId,description,minutes) {
 		});
 	}
 
+	// add work to project square
 	addWorkEntryToList(projectEntryData,workEntryData);
+	// update the total project time
 	updateProjectTotalTime(projectEntryData);
+	// update the total time
 	updateWorkLogTotalTime();
 }
 
 function addWorkEntryToList(projectEntryData,workEntryData) {
+	// UI container of project
 	var $projectEntry = projectEntryData.$element;
+	debugger;
 	var $projectWorkEntries = $projectEntry.find("[rel*=js-work-entries]");
-
+	debugger;
 	// create a new DOM element for the work entry
 	var $workEntry = $(workEntryTemplate);
 	$workEntry.attr("data-work-entry-id",workEntryData.id);
+	debugger;
 	$workEntry.find("[rel*=js-work-time]").text(formatTime(workEntryData.time));
+	// the ... part
 	setupWorkDescription(workEntryData,$workEntry.find("[rel*=js-work-description]"));
 
 	workEntryData.$element = $workEntry;
@@ -152,6 +165,7 @@ function addWorkEntryToList(projectEntryData,workEntryData) {
 
 			// insert the entry into the correct location in DOM
 			if (entryIdx < (projectEntryData.work.length - 1)) {
+				debugger;
 				projectEntryData.work[entryIdx + 1].$element.before($workEntry);
 			}
 			else {
