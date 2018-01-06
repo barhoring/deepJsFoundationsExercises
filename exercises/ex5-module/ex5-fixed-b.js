@@ -208,8 +208,8 @@ function setupApp(UI) {
 		}
 		projects.push(projectEntryData);
 
-		UI.addProjectToList(projectEntryData.id,projectEntryData.description);
-		UI.addProjectSelection(projectEntryData.id,projectEntryData.description);
+		UI.addProjectToList(this);
+		UI.addProjectSelection(this);
 	}
 
 	function findProjectEntry(projectId) {

@@ -32,18 +32,10 @@ var Helpers = {
 	}
 };
 
-const projectTemplate = "<div class='project-entry'><h3 class='project-description' rel='js-project-description'></h3><ul class='work-entries' rel='js-work-entries'></ul><span class='work-time' rel='js-work-time'></span></div>";
-const workEntryTemplate = "<li class='work-entry'><span class='work-time' rel='js-work-time'></span><span class='work-description' rel='js-work-description'></span></li>";
 
 var projects = [];
 
-var $workEntryForm;
-var $workEntrySelectProject;
-var $workEntryDescription;
-var $workEntryTime;
-var $workEntrySubmit;
-var $totalTime;
-var $projectList;
+
 
 var UI = setupUI();
 var App = setupApp(UI);
@@ -60,22 +52,7 @@ App.addProject("backlog");
 
 
 
-function submitNewWorkEntry() {
-	var projName = $workEntrySelectProject.val();
-	var description = $workEntryDescription.val();
-	var minutes = $workEntryTime.val();
 
-	if (!Helpers.validateWorkEntry(description,minutes)) {
-		alert("Oops, bad entry. Try again.");
-		$workEntryDescription[0].focus();
-		return;
-	}
-
-	$workEntryDescription.val("");
-	$workEntryTime.val("");
-	App.addWorkToProject(projName,description,Number(minutes));
-	$workEntryDescription[0].focus();
-}
 
 function findProjectEntry(projectId) {
 	for (let i = 0; i < projects.length; i++) {
@@ -102,6 +79,16 @@ function setupWorkDescription(workdesc,$workDescription) {
 
 
 function setupUI(){
+
+	const projectTemplate = "<div class='project-entry'><h3 class='project-description' rel='js-project-description'></h3><ul class='work-entries' rel='js-work-entries'></ul><span class='work-time' rel='js-work-time'></span></div>";
+	const workEntryTemplate = "<li class='work-entry'><span class='work-time' rel='js-work-time'></span><span class='work-description' rel='js-work-description'></span></li>";
+	var $workEntryForm;
+	var $workEntrySelectProject;
+	var $workEntryDescription;
+	var $workEntryTime;
+	var $workEntrySubmit;
+	var $totalTime;
+	var $projectList;
 
 	var projectsUI = [];
 
@@ -140,6 +127,23 @@ function setupUI(){
 		$projectList = $("[rel*=js-project-list]");
 	
 		$workEntrySubmit.on("click",submitNewWorkEntry);
+	}
+
+	function submitNewWorkEntry() {
+		var projName = $workEntrySelectProject.val();
+		var description = $workEntryDescription.val();
+		var minutes = $workEntryTime.val();
+	
+		if (!Helpers.validateWorkEntry(description,minutes)) {
+			alert("Oops, bad entry. Try again.");
+			$workEntryDescription[0].focus();
+			return;
+		}
+	
+		$workEntryDescription.val("");
+		$workEntryTime.val("");
+		App.addWorkToProject(projName,description,Number(minutes));
+		$workEntryDescription[0].focus();
 	}
 
 	// to do
