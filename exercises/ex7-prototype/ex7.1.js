@@ -3,7 +3,7 @@ var Helpers = {
 	minWorkDescriptionLength: 5,
 	maxWorkTime: 600,
 
-	validateWorkEntry(description,minutes) {
+	validateWorkEntry(description, minutes) {
 		if (description.length < this.minWorkDescriptionLength) return false;
 		if (
 			/^\s*$/.test(minutes) ||
@@ -18,7 +18,7 @@ var Helpers = {
 	},
 	formatWorkDescription(description) {
 		if (description.length > this.maxVisibleWorkDescriptionLength) {
-			description = `${description.substr(0,this.maxVisibleWorkDescriptionLength)}...`;
+			description = `${description.substr(0, this.maxVisibleWorkDescriptionLength)}...`;
 		}
 		return description;
 	},
@@ -37,6 +37,14 @@ UI.init();
 var App = setupApp(UI);
 
 // hard coding some initial data
+
+/*
+clientFeatures = new Project("client features");
+overhead = new Project("overhead");
+backlog = new Project("backlog");
+console.log(this);
+*/
+
 App.addProject("client features");
 App.addProject("overhead");
 App.addProject("backlog");
@@ -82,7 +90,7 @@ function setupUI() {
 		$totalTime = $("[rel*=js-total-work-time]");
 		$projectList = $("[rel*=js-project-list]");
 
-		$workEntrySubmit.on("click",submitNewWorkEntry);
+		$workEntrySubmit.on("click", submitNewWorkEntry);
 	}
 
 	function submitNewWorkEntry() {
@@ -90,7 +98,7 @@ function setupUI() {
 		var description = $workEntryDescription.val();
 		var minutes = $workEntryTime.val();
 
-		if (!Helpers.validateWorkEntry(description,minutes)) {
+		if (!Helpers.validateWorkEntry(description, minutes)) {
 			alert("Oops, bad entry. Try again.");
 			$workEntryDescription[0].focus();
 			return;
@@ -98,16 +106,17 @@ function setupUI() {
 
 		$workEntryDescription.val("");
 		$workEntryTime.val("");
-		App.addWorkToProject(Number(projectId),description,Number(minutes));
+		App.addWorkToProject(Number(projectId), description, Number(minutes));
 		$workEntryDescription[0].focus();
 	}
 
 	function addProjectToList(project) {
 		var projectId = project.getId();
+		 
 		var projectDescription = project.getDescription();
 
 		var $project = $(projectTemplate);
-		$project.attr("data-project-id",projectId);
+		$project.attr("data-project-id", projectId);
 		$project.find("[rel*=js-project-description]").text(projectDescription);
 		$projectList.append($project);
 		projectElements[projectId] = $project;
@@ -118,29 +127,30 @@ function setupUI() {
 		var projectDescription = project.getDescription();
 
 		var $option = $("<option></option>");
-		$option.attr("value",projectId);
+		$option.attr("value", projectId);
 		$option.text(projectDescription);
 		$workEntrySelectProject.append($option);
 	}
 
-	function addWorkEntryToList(project,workEntryData) {
+	function addWorkEntryToList(project, workEntryData) {
 		var projectId = project.getId();
 
-		var $projectEntry = projectElements[projectId];
+		var $projectEntry = projectElements[project.getId()];
 		var $projectWorkEntries = $projectEntry.find("[rel*=js-work-entries]");
 
 		// create a new DOM element for the work entry
 		var $workEntry = $(workEntryTemplate);
-		$workEntry.attr("data-work-entry-id",workEntryData.id);
+		$workEntry.attr("data-work-entry-id", workEntryData.id);
 		$workEntry.find("[rel*=js-work-time]").text(Helpers.formatTime(workEntryData.time));
-		setupWorkDescription(workEntryData,$workEntry.find("[rel*=js-work-description]"));
+		setupWorkDescription(workEntryData, $workEntry.find("[rel*=js-work-description]"));
 
 		workElements[workEntryData.id] = $workEntry;
 
 		// multiple work entries now?
 		if (project.getWorkEntryCount() > 1) {
-			{ let adjacentWorkEntryId, insertBefore;
-				[ adjacentWorkEntryId, insertBefore ] = project.getWorkEntryLocation(workEntryData.id);
+			{
+				let adjacentWorkEntryId, insertBefore;
+				[adjacentWorkEntryId, insertBefore] = project.getWorkEntryLocation(workEntryData.id);
 
 				if (insertBefore) {
 					workElements[adjacentWorkEntryId].before($workEntry);
@@ -157,16 +167,16 @@ function setupUI() {
 		}
 	}
 
-	function setupWorkDescription(workEntryData,$workDescription) {
+	function setupWorkDescription(workEntryData, $workDescription) {
 		$workDescription.text(Helpers.formatWorkDescription(workEntryData.description));
 
 		if (workEntryData.description.length > Helpers.maxVisibleWorkDescriptionLength) {
 			$workDescription
 				.addClass("shortened")
-				.on("click",function onClick(){
+				.on("click", function onClick() {
 					$workDescription
 						.removeClass("shortened")
-						.off("click",onClick)
+						.off("click", onClick)
 						.text(workEntryData.description);
 				});
 		}
@@ -177,7 +187,7 @@ function setupUI() {
 		var projectTime = project.getTime();
 
 		var $projectEntry = projectElements[projectId];
-		$projectEntry.find("> [rel*=js-work-time]").text(Helpers.formatTime(projectTime)).show();
+		$projectEntry.find("> [rel*=js-work-time]").text(Helpers.formatTime(project.getTime())).show();
 	}
 
 	function updateWorkLogTotalTime(time) {
@@ -210,7 +220,9 @@ function setupApp(UI) {
 	// **************************
 
 	function addProject(description) {
-		var project = Project(description);
+		var project = new Project(description);
+		console.log(this);
+		console.log(project);
 		projects.push(project);
 
 		UI.addProjectToList(project);
@@ -225,9 +237,8 @@ function setupApp(UI) {
 		}
 	}
 
-	function addWorkToProject(projectId,description,minutes) {
+	function addWorkToProject(projectId, description, minutes) {
 		totalTime = (totalTime || 0) + minutes;
-
 		var project = findProjectEntry(projectId);
 
 		// create a new work entry for the list
@@ -235,7 +246,7 @@ function setupApp(UI) {
 
 		project.addWork(workEntryData);
 
-		UI.addWorkEntryToList(project,workEntryData);
+		UI.addWorkEntryToList(project, workEntryData);
 		UI.updateProjectTotalTime(project);
 		UI.updateWorkLogTotalTime(totalTime);
 	}
@@ -247,71 +258,59 @@ function setupApp(UI) {
 
 
 function Project(description) {
-	var projectId = Math.round(Math.random()*1E4);
-	var work = [];
-	var time = 0;
+	this.description = description;
+	this.projectId = Math.round(Math.random() * 1E4);
+	this.work = [];
+	this.time = 0;
 
-	var publicAPI = {
-		getId: getId,
-		getDescription: getDescription,
-		getTime: getTime,
-		addWork: addWork,
-		getWorkEntryCount: getWorkEntryCount,
-		getWorkEntryLocation: getWorkEntryLocation
+	Project.prototype.getId = function getId() {
+		return this.projectId;
 	};
 
-	return publicAPI;
+	Project.prototype.getDescription = function getDescription() {
+		return this.description;
+	};
 
+	Project.prototype.getTime = function() {
+		return this.time;
+	};
 
-	// **************************
+	Project.prototype.addWork = function addWork(workEntryData) {
+		 ;
+		workEntryData.id = this.work.length + 1;
+		this.work.push(workEntryData);
 
-	function getId() {
-		return projectId;
-	}
-
-	function getDescription() {
-		return description;
-	}
-
-	function getTime() {
-		return time;
-	}
-
-	function addWork(workEntryData) {
-		workEntryData.id = work.length + 1;
-		work.push(workEntryData);
-
-		time = (time || 0) + workEntryData.time;
-
+		this.time = (this.time || 0) + workEntryData.time;
 		// multiple work entries now?
-		if (work.length > 1) {
+		if (this.work.length > 1) {
 			// sort work entries in descending order of time spent
-			work.sort(function sortTimeDescending(a,b){
+			this.work.sort(function sortTimeDescending(a, b) {
 				return b.time - a.time;
 			});
 		}
-	}
+	};
 
-	function getWorkEntryCount() {
-		return work.length;
-	}
+	Project.prototype.getWorkEntryCount = function getWorkEntryCount() {
+		return this.work.length;
+	};
 
-	function getWorkEntryLocation(workEntryId) {
+	Project.prototype.getWorkEntryLocation = function getWorkEntryLocation(workEntryId) {
 		// find where the entry sits in the new sorted list
 		var entryIdx;
-		for (let i = 0; i < work.length; i++) {
-			if (work[i].id == workEntryId) {
+		for (let i = 0; i < this.work.length; i++) {
+			if (this.work[i].id == workEntryId) {
 				entryIdx = i;
 				break;
 			}
 		}
 
 		// insert the entry into the correct location in DOM
-		if (entryIdx < (work.length - 1)) {
-			return [ work[entryIdx + 1].id, /*insertBefore=*/true ];
+		if (entryIdx < (this.work.length - 1)) {
+			return [this.work[entryIdx + 1].id, /*insertBefore=*/true];
 		}
 		else {
-			return [ work[entryIdx - 1].id, /*insertBefore=*/false ];
+			return [this.work[entryIdx - 1].id, /*insertBefore=*/false];
 		}
-	}
+	};
+
 }

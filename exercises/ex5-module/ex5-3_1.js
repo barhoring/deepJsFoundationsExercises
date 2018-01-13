@@ -1,15 +1,91 @@
+var totalTime;
+/*
+var p1 = Project("client-features");
+var p2 = Project("overhead");
+var p3 = Project("backlog");
+*/
+
+function Project(description){
+	var id = projectId = Math.round(Math.random()*1E4);
+	var time;
+	var work = [];
+
+	return PublicAPI = {
+		getId,
+		getDescription,
+		getTime,
+		addWork,
+		getWorkEntryCount,
+		getWorkEntryLocation,
+	};
+	return publicAPI;
+
+	function getId(){
+		return id;
+	}
+
+	function getDescription(){
+		return description;
+	}
+
+	function getTime(){
+		return time;
+	}
+
+	function addWork(workEntryData){
+		//var projectEntryData = findProjectEntry(projectId);
+		time = (time || 0) + workEntryData.time;
+	
+		// create a new work entry for the list
+		//var workEntryData = { id: work.length + 1, description: description, time: minutes };
+		work.push(workEntryData);
+	
+		// multiple work entries now?
+		if (work.length > 1) {
+			// sort work entries in descending order of time spent
+			work = work.slice().sort(function sortTimeDescending(a,b){
+					return b.time - a.time;
+				});
+		}
+			
+	}
+
+	function getWorkEntryCount(){
+		return work.length;
+	}
+
+	function getWorkEntryLocation(workId){
+		var index;
+		for(let i = 0; i < work.length; i++){
+			if(work[i].id == workId){
+				index = i; 
+				break;
+			}		
+		}
+
+		if(index < work.length - 1){
+			return [ work[index+1].id , /*insertBefore=*/ true]
+		}
+		else{
+			return [ work[index-1].id , /*insertBefore=*/ false]
+		}
+	}
+
+}
+
+
 var Helpers = {
 	maxVisibleWorkDescriptionLength: 20,
 	minWorkDescriptionLength: 5,
 	maxWorkTime: 600,
 
 	validateWorkEntry(description,minutes) {
-		if (description.length < this.minWorkDescriptionLength) return false;
+		if (description.length < Helpers.minWorkDescriptionLength) return false;
 		if (
 			/^\s*$/.test(minutes) ||
 			Number.isNaN(Number(minutes)) ||
 			minutes < 0 ||
-			minutes > this.maxWorkTime
+			minutes > Helpers.maxWorkTime
 		) {
 			return false;
 		}
@@ -17,8 +93,8 @@ var Helpers = {
 		return true;
 	},
 	formatWorkDescription(description) {
-		if (description.length > this.maxVisibleWorkDescriptionLength) {
-			description = `${description.substr(0,this.maxVisibleWorkDescriptionLength)}...`;
+		if (description.length > Helpers.maxVisibleWorkDescriptionLength) {
+			description = `${description.substr(0,Helpers.maxVisibleWorkDescriptionLength)}...`;
 		}
 		return description;
 	},
@@ -37,14 +113,23 @@ UI.init();
 var App = setupApp(UI);
 
 // hard coding some initial data
+/*
+var clientFeatures = Project("client features");
+var overhead = Project("overhead");
+var backlog = Project("backlog");
+*/
+
 App.addProject("client features");
 App.addProject("overhead");
 App.addProject("backlog");
 
 
+
+
 // **************************
 
 function setupUI() {
+
 	const projectTemplate = "<div class='project-entry'><h3 class='project-description' rel='js-project-description'></h3><ul class='work-entries' rel='js-work-entries'></ul><span class='work-time' rel='js-work-time'></span></div>";
 	const workEntryTemplate = "<li class='work-entry'><span class='work-time' rel='js-work-time'></span><span class='work-description' rel='js-work-description'></span></li>";
 
@@ -69,7 +154,6 @@ function setupUI() {
 	};
 
 	return publicAPI;
-
 
 	// **************************
 
@@ -103,30 +187,23 @@ function setupUI() {
 	}
 
 	function addProjectToList(project) {
-		var projectId = project.getId();
-		var projectDescription = project.getDescription();
-
 		var $project = $(projectTemplate);
-		$project.attr("data-project-id",projectId);
-		$project.find("[rel*=js-project-description]").text(projectDescription);
+		$project.attr("data-project-id",project.getId());
+		$project.find("[rel*=js-project-description]").text(project.getDescription());
 		$projectList.append($project);
-		projectElements[projectId] = $project;
+		projectElements[project.getId()] = $project;
 	}
 
 	function addProjectSelection(project) {
-		var projectId = project.getId();
-		var projectDescription = project.getDescription();
-
 		var $option = $("<option></option>");
-		$option.attr("value",projectId);
-		$option.text(projectDescription);
+		$option.attr("value",project.getId());
+		$option.text(project.getDescription());
 		$workEntrySelectProject.append($option);
 	}
 
 	function addWorkEntryToList(project,workEntryData) {
-		var projectId = project.getId();
-
-		var $projectEntry = projectElements[projectId];
+		debugger;
+		var $projectEntry = projectElements[project.getId()];
 		var $projectWorkEntries = $projectEntry.find("[rel*=js-work-entries]");
 
 		// create a new DOM element for the work entry
@@ -173,11 +250,8 @@ function setupUI() {
 	}
 
 	function updateProjectTotalTime(project) {
-		var projectId = project.getId();
-		var projectTime = project.getTime();
-
-		var $projectEntry = projectElements[projectId];
-		$projectEntry.find("> [rel*=js-work-time]").text(Helpers.formatTime(projectTime)).show();
+		var $projectEntry = projectElements[project.getId()];
+		$projectEntry.find("> [rel*=js-work-time]").text(Helpers.formatTime(project.getTime())).show();
 	}
 
 	function updateWorkLogTotalTime(time) {
@@ -201,17 +275,17 @@ function setupApp(UI) {
 
 	var publicAPI = {
 		addProject: addProject,
-		addWorkToProject: addWorkToProject
+		addWorkToProject: addWorkToProject,
 	};
 
 	return publicAPI;
 
-
 	// **************************
 
-	function addProject(description) {
-		var project = Project(description);
-		projects.push(project);
+	function addProject(decription) {
+
+		var project = Project(decription);
+		projects.push(project)
 
 		UI.addProjectToList(project);
 		UI.addProjectSelection(project);
@@ -225,93 +299,14 @@ function setupApp(UI) {
 		}
 	}
 
-	function addWorkToProject(projectId,description,minutes) {
+	function addWorkToProject(projectId, description, minutes){
 		totalTime = (totalTime || 0) + minutes;
-
 		var project = findProjectEntry(projectId);
-
-		// create a new work entry for the list
-		var workEntryData = { description: description, time: minutes };
-
+		var workEntryData = { id: project.getWorkEntryCount() + 1, description: description, time: minutes };
 		project.addWork(workEntryData);
-
 		UI.addWorkEntryToList(project,workEntryData);
 		UI.updateProjectTotalTime(project);
 		UI.updateWorkLogTotalTime(totalTime);
-	}
-}
 
-
-// ****************************************************************
-// ****************************************************************
-
-
-function Project(description) {
-	var projectId = Math.round(Math.random()*1E4);
-	var work = [];
-	var time = 0;
-
-	var publicAPI = {
-		getId: getId,
-		getDescription: getDescription,
-		getTime: getTime,
-		addWork: addWork,
-		getWorkEntryCount: getWorkEntryCount,
-		getWorkEntryLocation: getWorkEntryLocation
-	};
-
-	return publicAPI;
-
-
-	// **************************
-
-	function getId() {
-		return projectId;
-	}
-
-	function getDescription() {
-		return description;
-	}
-
-	function getTime() {
-		return time;
-	}
-
-	function addWork(workEntryData) {
-		workEntryData.id = work.length + 1;
-		work.push(workEntryData);
-
-		time = (time || 0) + workEntryData.time;
-
-		// multiple work entries now?
-		if (work.length > 1) {
-			// sort work entries in descending order of time spent
-			work.sort(function sortTimeDescending(a,b){
-				return b.time - a.time;
-			});
-		}
-	}
-
-	function getWorkEntryCount() {
-		return work.length;
-	}
-
-	function getWorkEntryLocation(workEntryId) {
-		// find where the entry sits in the new sorted list
-		var entryIdx;
-		for (let i = 0; i < work.length; i++) {
-			if (work[i].id == workEntryId) {
-				entryIdx = i;
-				break;
-			}
-		}
-
-		// insert the entry into the correct location in DOM
-		if (entryIdx < (work.length - 1)) {
-			return [ work[entryIdx + 1].id, /*insertBefore=*/true ];
-		}
-		else {
-			return [ work[entryIdx - 1].id, /*insertBefore=*/false ];
-		}
 	}
 }
