@@ -4,7 +4,52 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        
+        {
+            "name": "Django",
+            "type": "python",
+            "request": "launch",
+            "stopOnEntry": true,
+            "pythonPath": "${config:python.pythonPath}",
+            "program": "${workspaceFolder}/manage.py",
+            "cwd": "${workspaceFolder}",
+            "args": [
+                "runserver",
+                "--noreload",
+                "--nothreading"
+            ],
+            "env": {},
+            "envFile": "${workspaceFolder}/.env",
+            "debugOptions": [
+                "RedirectOutput",
+                "DjangoDebugging"
+            ]
+        },
+        {
+            "name": "External Terminal/Console",
+            "type": "python",
+            "request": "launch",
+            "stopOnEntry": true,
+            "pythonPath": "${config:python.pythonPath}",
+            "program": "${file}",
+            "cwd": "",
+            "console": "externalTerminal",
+            "env": {},
+            "envFile": "${workspaceFolder}/.env",
+            "debugOptions": []
+        },
+       {
+           "name": "Integrated Terminal/Console",
+           "type": "python",
+           "request": "launch",
+           "stopOnEntry": true,
+           "pythonPath": "${config:python.pythonPath}",
+           "program": "${file}",
+           "cwd": "",
+           "console": "integratedTerminal",
+           "env": {},
+           "envFile": "${workspaceFolder}/.env",
+           "debugOptions": []
+       },
         {
             "type": "java",
             "name": "Debug (Launch)-mon2",
